@@ -1,6 +1,15 @@
 {
-	"appId": "io.ionic.starter",
-	"appName": "chap chap",
+	"appId": "com.techchapchap.com",
+	"appName": "Chap Chap",
 	"webDir": "dist",
-	"bundledWebRuntime": false
+	"bundledWebRuntime": false,
+	"plugins":{
+		"SplashScreen":{
+			"launchAutoHide": false
+		},
+		"LocalNotifications": {
+      "smallIcon": "ic_stat_icon",
+      "iconColor": "#03A61c"
+    }
+	}
 }
