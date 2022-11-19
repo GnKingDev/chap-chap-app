@@ -86,17 +86,18 @@
 
 <script>
 
-import { defineComponent } from 'vue';
+import { defineComponent, vShow } from 'vue';
 import LogoName from '@/components/LgoName.vue'
 import InitAchatInresto from '@/components/InitAchatInresto.vue'
 import GarNiture from '@/components/GarNiture.vue'
 import{IonPage,IonContent,IonHeader,IonToolbar,IonMenuButton,IonButtons,IonIcon,IonChip,IonLabel,IonButton,loadingController,IonFooter,IonCard,IonCardContent,IonThumbnail,IonImg,IonText,popoverController,alertController,IonSegment,IonSegmentButton,modalController,}from'@ionic/vue'
-import { restaurant,addCircle,removeCircle,squareOutline,} from 'ionicons/icons';
+import { restaurant,addCircle,removeCircle,squareOutline, alert,} from 'ionicons/icons';
 import { collection,getDocs,getFirestore,doc,getDoc, query, where} from "firebase/firestore"
 import app from '@/firebase';
 import store from '@/VerifyUserStore';
 import { Geolocation } from '@capacitor/geolocation';
 import { getAuth, onAuthStateChanged } from '@firebase/auth';
+import router from '@/router';
 export default defineComponent({
 name:"RestoFood",
 components:{
@@ -213,6 +214,51 @@ async beforeCreate(){
         message:"patientez s'il vous plait"
     })
     attendre.present()
+    let v1 =""
+   store.get('t').then((value)=>{
+       this.test=value
+    })
+  store.get('r').then((v)=>{
+    v1=v
+  })
+  if(this.test==true){
+    if(v1=='oui'){
+     this.AllRestoData=[]
+     setTimeout(()=>{
+        this.enCasRestoIndis=true
+     },3000)
+    }else{
+        const alert = await alertController.create({
+            message:"Nous avons besion de votre service de localisation pour vous afficher uniquement les restaurants proches de vous ?",
+            buttons:[{
+                text:"Ok",
+                cssClass:"primary",
+                handler:()=>{
+                    Geolocation.getCurrentPosition({enableHighAccuracy:true}).then((result)=>{
+                         this.AllRestoData=[]
+     setTimeout(()=>{
+        this.enCasRestoIndis=true
+        attendre.dismiss()
+     },3000)
+                    }).catch(()=>{
+                        this.$router.back()
+                        attendre.dismiss()
+                    })
+                }
+            },{
+                text:"Non",
+                cssClass:"primary",
+                handler:()=>{
+                    this.$router.back()
+                    attendre.dismiss()
+                }
+            }]
+        })
+        alert.present()
+    }
+ return
+  }
+
     try {
         await store.get("UserTown").then((value)=>{
             this.UserTown=value

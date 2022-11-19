@@ -119,11 +119,21 @@ export default defineComponent({
             attendre.dismiss()
             toast.present()
             
+          }else {
+             const refuser = await doc(db,"APPINFO","UserMessages")
+             await updateDoc(refuser,{
+              AllMessage:arrayUnion({
+               message:this.Message
+              })
+            })
+             const toast = await toastController.create({message:"message envoye avec succes vous serez contacte par l'equipe chap chap",duration:2000})
+            attendre.dismiss()
+            toast.present()
           }
         })
       } catch (error) {
         attendre.dismiss()
-         const toast = await toastController.create({message:"message non envoyer reessayer",duration:2000})
+         const toast = await toastController.create({message:`message non envoyer reessayer ${error.message}`,duration:2000})
             attendre.dismiss()
             toast.present()
       }

@@ -51,7 +51,7 @@ import { defineComponent, onMounted, reactive,  } from 'vue';
 import { ellipse,cart,calendar,call,atCircle,heart,paperPlane,lockClosed,information,exit,chatbubble} from 'ionicons/icons';
 import { doc, getDoc, getFirestore, onSnapshot, Timestamp } from "firebase/firestore";
 import app from '@/firebase';
-import { getAuth, onAuthStateChanged, signOut} from "firebase/auth";
+import { getAuth, onAuthStateChanged, signOut,initializeAuth, indexedDBLocalPersistence,} from "firebase/auth";
 import { Network } from '@capacitor/network';
 import { App } from '@capacitor/app';
 import store from './VerifyUserStore';
@@ -60,6 +60,7 @@ import {LocalNotifications} from '@capacitor/local-notifications'
 import {Browser} from '@capacitor/browser'
 import { SplashScreen } from '@capacitor/splash-screen'
 import { Device } from '@capacitor/device';
+import { Capacitor } from '@capacitor/core';
 export default defineComponent({
   name: 'App',
   components: {
@@ -77,6 +78,11 @@ export default defineComponent({
   },
  
   setup(){
+    if(Capacitor.isNativePlatform()){
+      initializeAuth(app,{
+        persistence:indexedDBLocalPersistence
+      })
+    }
     onMounted(()=>{
       setTimeout(async() => {
          await SplashScreen.hide()
@@ -176,7 +182,10 @@ export default defineComponent({
     })
     //deconnexion
     const signout = async ()=>{
-      const alert = await alertController.create({
+      const auth = getAuth(app)
+      onAuthStateChanged(auth,async(user)=>{
+        if(user){
+            const alert = await alertController.create({
         header:"Voulez-vous vous deconnecter ?",
         buttons:[{
           text:"Oui",
@@ -201,6 +210,9 @@ export default defineComponent({
         }]
       })
       alert.present()
+        }
+      })
+     
       
     }
     //fin deconnexion
@@ -209,6 +221,11 @@ export default defineComponent({
  const GotoMessge = async ()=>{
    const attendre = await loadingController.create({message:"Patientez s'il vous plait "})
    attendre.present()
+   const auth = getAuth(app)
+   onAuthStateChanged(auth,async(user)=>{
+    if(user){
+
+   
    try {
       const db = await getFirestore(app)
       const refuser = doc(db,"USERS",userInfo.id)
@@ -236,7 +253,29 @@ export default defineComponent({
      const alert = await alertController.create({message:"erreur du serveur"})
      alert.present()
    }
-   
+ }else{
+  const alert = await alertController.create({
+                header:"Vous n'avez pas de compte",
+                message:"Vous devez avoir un compte pour utiliser cette fonctionalite voulez vous creer un compte ?",
+                buttons:[{
+                    text:"Non",
+                    cssClass:"primary",
+                    handler:()=>{
+                        router.back()
+                        return
+                    }
+                },{
+                    text:"creer un compte",
+                    cssClass:"primary",
+                    handler:()=>{
+                        router.push({path:"/CreateAcountPage"})
+                    }
+                }]
+                
+            })
+            alert.present()
+            attendre.dismiss()
+ }})
     
  }
  let Shareink = reactive({android:"",ios:"",isActive:true})

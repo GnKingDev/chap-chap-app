@@ -182,6 +182,29 @@ export default defineComponent({
     }
       let user
    await onAuthStateChanged(auth,(ui)=>user=ui.uid)
+   if(!user){
+    const alert = await alertController.create({
+                header:"Vous n'avez pas de compte",
+                message:"Vous devez avoir un compte pour utiliser cette fonctionalite voulez vous creer un compte ?",
+                buttons:[{
+                    text:"Non",
+                    cssClass:"primary",
+                    handler:()=>{
+                       this.$router.back()
+                        return
+                    }
+                },{
+                    text:"creer un compte",
+                    cssClass:"primary",
+                    handler:()=>{
+                        this.$router.push({path:"/CreateAcountPage"})
+                    }
+                }]
+                
+            })
+            alert.present()
+            return
+   }
    const refUser= await doc(db,"USERS",`${user}`)
    //prendre les favoris de l'utilisateur
    const dataUser = await getDoc(refUser)
@@ -325,6 +348,29 @@ export default defineComponent({
     }
       let user
    await onAuthStateChanged(auth,(ui)=>user=ui.uid)
+   if(!user){
+    const alert = await alertController.create({
+                header:"Vous n'avez pas de compte",
+                message:"Vous devez avoir un compte pour utiliser cette fonctionalite voulez vous creer un compte ?",
+                buttons:[{
+                    text:"Non",
+                    cssClass:"primary",
+                    handler:()=>{
+                       this.$router.back()
+                        return
+                    }
+                },{
+                    text:"creer un compte",
+                    cssClass:"primary",
+                    handler:()=>{
+                        this.$router.push({path:"/CreateAcountPage"})
+                    }
+                }]
+                
+            })
+            alert.present()
+            return
+   }
    const refUser= await doc(db,"USERS",`${user}`)
    //prendre les favoris de l'utilisateur
    const dataUser = await getDoc(refUser)

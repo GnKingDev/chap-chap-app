@@ -1,21 +1,11 @@
 <template>
 <ion-page>
     <ion-header class="ion-no-border" >
-       <main v-if="M.succes==true">
-        <div class="header-section">
-            <div class="left-arrow">
-           
-                <ion-back-button default-href="tabs/tab1" mode="md" class="b" color="light" ></ion-back-button>
-           
-            </div>
-            <div class="message-title">
-                <h3>Messages</h3>
-            </div>
-            <div class="buttons">
-            <ion-icon :icon="chatbubble" ></ion-icon>
-            </div>
-        </div>
-    </main>
+        <ion-toolbar v-if="M.succes==true" >
+         <ion-back-button default-href="tabs/tab1" mode="md" class="b" color="primary"  slot="start"></ion-back-button>
+         <ion-title color="primary">Message</ion-title>
+         <ion-icon :icon="chatbubble" slot="end"></ion-icon>
+        </ion-toolbar>
     </ion-header>
 <ion-content>
     <div v-if="M.succes==true" class="itemMessage" >
@@ -36,7 +26,7 @@
 
 <script>
 import { defineComponent,  reactive } from "@vue/runtime-core";
-import {IonHeader,IonBackButton,IonContent,IonItem,IonLabel,IonBadge,IonAvatar,IonPage,IonIcon, loadingController, alertController, onIonViewWillEnter,} from '@ionic/vue'
+import {IonHeader,IonBackButton,IonContent,IonItem,IonLabel,IonBadge,IonAvatar,IonPage,IonIcon, loadingController, alertController, onIonViewWillEnter,IonToolbar,IonTitle} from '@ionic/vue'
 import {chatbubble} from 'ionicons/icons'
 import router from "@/router";
 import { getAuth, onAuthStateChanged } from "@firebase/auth";
@@ -53,7 +43,9 @@ components:{
     IonItem,
     IonLabel,
     IonAvatar,
-    IonBadge
+    IonBadge,
+    IonToolbar,
+    IonTitle
 },
 setup(){
    
@@ -152,147 +144,7 @@ setup(){
 </script>
 
 <style lang="scss" scoped>
-.itemMessage{
-    margin-top: 100px;
-}
-ion-content .inbox-section{
-     position: relative;
-        top: 4.5em;
-        z-index: 1;
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: auto;
-        flex-direction: column;
-}
-
-ion-content .inbox-section .message{
-     position: relative;
-            width: 95%;
-            height: 3em;
-            display: flex;
-            margin-bottom: 1em;
-}
-
-ion-content .inbox-section .message:first-of-type {
-margin-top: 2em;
-}
-ion-content .inbox-section .message .picture-section{
-           position: relative;
-                width: 20%;
-                height: 100%;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-}
-ion-content .inbox-section .message .picture-section img{
-                    width: 3.6em;
-                    height: 3.6em;
-                    object-fit: cover;
-                    border-radius: 50%;
-}
-ion-content .inbox-section .message .content-section{
-               position: relative;
-                width: calc(60% - .5em);
-                padding: 0 .5em;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-evenly;
-}
-ion-content .inbox-section .message .content-section .name{
-font-size: 22px;
-}
-ion-content .inbox-section .message .content-section .message-content{
-                   font-size: 17px;
-                  color: rgb(167, 167, 167);
-                  text-overflow: ellipsis;
-                  overflow: hidden;
-                  white-space: nowrap;
-}
-ion-content .inbox-section .message .date_time-section{
-                    position: relative;
-                    width: 20%;
-                    height: 100%;
-                    display: flex;
-                    justify-content: space-evenly;
-                    flex-direction: column;
-}
-ion-content .inbox-section .message .date_time-section .date_time{
-                     font-size: 17px;
-                        color:rgb(167, 167, 167);
-                        display: flex;
-                        justify-content: center;
-}
-ion-content .inbox-section .message .date_time-section .num{
-                         font-size: 15px;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        background-color: #03A61c;
-                        width: fit-content;
-                        width: 1em;
-                        height: 1em;
-                        padding: .25em;
-                        border-radius: 50%;
-                        color: #fff;
-                        position: relative;
-                        left: 50%;
-                        transform: translateX(-50%);
-}
 
 
-
-ion-header{
-    main{
-        position: relative;
-        width: auto;
-       height: auto;
-       .header-section{
-           position: fixed;
-           width: 100%;
-           height: 3.5rem;
-           background-color:#03A61c;
-           display: flex;
-           justify-content: space-between;
-           align-items: center;
-           border-bottom-left-radius: 40px;
-           border-bottom-right-radius: 40px;
-             z-index: 2;
-           .left-aarow{
-               position: relative;
-               width: 20%;
-               height: 100%;
-               display: flex;
-               justify-content: center;
-               align-items: center;
-           }
-           .message-title{
-               position: relative;
-               width: 60%;
-               height: 100%;
-               display: flex;
-               justify-content: center;
-               align-items: center;
-              h3{
-                   color: #fff;
-               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-               text-transform: capitalize;
-              }
-           }
-           .buttons{
-               position: relative;
-               width: 20%;
-               display: flex;
-               justify-content: space-evenly;
-               align-items: center;
-               ion-icon{
-                   font-size: 30px;
-                   color: #fff;
-               }
-           }
-       }
-    }
-}
 
 </style>

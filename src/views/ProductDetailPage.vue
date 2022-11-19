@@ -279,6 +279,7 @@ async ionViewWillEnter(){
 
       await onAuthStateChanged(auth,(User)=>user=User.uid)
         //DEBUT verification si l'utilisateur a deja like le produit
+        if(user){
          const refUser= await doc(db,"USERS",`${user}`)
          const Datauser= await getDoc(refUser)
          let data={}
@@ -293,6 +294,7 @@ async ionViewWillEnter(){
            }
            
          }
+    }
          //fin verification si l'utilisateur a deja like le produit
        const refProduit=await doc(db,"PRODUITS",`${this.$route.params.id}`)
        const Data = await getDoc(refProduit)
@@ -301,14 +303,11 @@ async ionViewWillEnter(){
           this.OneProduitShow.prix=parseInt(this.OneProduitShow.prix)
           this.Pricebar=this.OneProduitShow.prix
           this.RealPrice=this.OneProduitShow.prix
-            if(this.OneProduitShow.views){
               this.OneProduitShow.views=this.OneProduitShow.views +1
               await updateDoc(refProduit,{
                 views:increment(1)
               })
-            }else{
-              this.OneProduitShow.views=1
-            }
+            
         //fin instant chop
           //verifaction si promo code est active 
           const refFour = await doc(db,"FOURNISSEURS",`${this.OneProduitShow.IdFournisseur}`)
@@ -436,6 +435,8 @@ async ionViewWillEnter(){
        alert.present()
        return
      }
+     const auth = getAuth(app)
+     
      if(this.compteu==1){
        this.SommeTotale=this.OneProduitShow.prix
      }
@@ -447,7 +448,33 @@ async ionViewWillEnter(){
        componentProps:{nom:this.OneProduitShow.nomProd,ville:this.OneProduitShow.ville,taille:this.takeTaille,couleur:this.couleurLienName,nombreProduit:this.compteu,sommeTotat:this.SommeTotale,RealPrice:this.RealPrice,EndPoint:this.EndPoint,UserInfo:this.UserInfo,Product:this.OneProduitShow,fourInfo:this.fourInfo}
        
       })
-      pop.present()
+      await onAuthStateChanged(auth,async(user)=>{
+      if(!user){
+        const alert = await alertController.create({
+                header:"Vous n'avez pas de compte",
+                message:"Vous devez avoir un compte pour acheter un produit cela nous permettra d'enregistre vos historique achats et autres ?",
+                buttons:[{
+                    text:"Non",
+                    cssClass:"primary",
+                    handler:()=>{
+                        return
+                    }
+                },{
+                    text:"creer un compte",
+                    cssClass:"primary",
+                    handler:()=>{
+                        this.$router.push({path:"/CreateAcountPage"})
+                    }
+                }]
+                
+            })
+            alert.present()
+            return
+      }else{
+         pop.present()
+      }
+     })
+     
     },
     //fin les methodes pour le payement
     //ouverture pour pop  message
@@ -612,6 +639,29 @@ async ionViewWillEnter(){
         const db = await getFirestore(app)
         const auth = await getAuth(app)
         await onAuthStateChanged(auth,(User)=>user=User.uid)
+        if(!user){
+          const alert = await alertController.create({
+                header:"Vous n'avez pas de compte",
+                message:"Vous devez avoir un compte pour utiliser cette fonctionalite voulez vous creer un compte ?",
+                buttons:[{
+                    text:"Non",
+                    cssClass:"primary",
+                    handler:()=>{
+                        this.$router.back()
+                        return
+                    }
+                },{
+                    text:"creer un compte",
+                    cssClass:"primary",
+                    handler:()=>{
+                        this.$router.push({path:"/CreateAcountPage"})
+                    }
+                }]
+                
+            })
+            alert.present()
+            return
+        }
         const refUser = await doc(db,"USERS",`${user}`)
         const refproduit = await doc(db,"PRODUITS",`${id}`)
         if(this.like==false){
@@ -673,6 +723,34 @@ async ionViewWillEnter(){
           const attendre = await loadingController.create({message:"patientez s'il vous plait "})
           attendre.present()
          try {
+          const auth = getAuth(app)
+          await onAuthStateChanged(auth,async(user)=>{
+            if(!user){
+              const alert = await alertController.create({
+                header:"Vous n'avez pas de compte",
+                message:"Vous devez avoir un compte pour utiliser cette fonctionalite voulez vous creer un compte ?",
+                buttons:[{
+                    text:"Non",
+                    cssClass:"primary",
+                    handler:()=>{
+                        this.$router.back()
+                        return
+                    }
+                },{
+                    text:"creer un compte",
+                    cssClass:"primary",
+                    handler:()=>{
+                        this.$router.push({path:"/CreateAcountPage"})
+                    }
+                }]
+                
+            })
+            alert.present()
+            attendre.dismiss()
+            return
+            }
+            
+          })
           const db = await getFirestore(app)
            const refuser = await doc(db,"USERS",this.UserInfo.id)
            const refFour = await doc(db,"FOURNISSEURS",this.fourInfo.id)
@@ -867,7 +945,30 @@ async ionViewWillEnter(){
            const db= await getFirestore(app)
            const auth = await getAuth(app)
            let user
-            await onAuthStateChanged(auth,(User)=>user=User.uid)
+            await onAuthStateChanged(auth,async(User)=>user=User.uid)
+            if(!user){
+              const alert = await alertController.create({
+                header:"Vous n'avez pas de compte",
+                message:"Vous devez avoir un compte pour utiliser cette fonctionalite voulez vous creer un compte ?",
+                buttons:[{
+                    text:"Non",
+                    cssClass:"primary",
+                    handler:()=>{
+                        this.$router.back()
+                        return
+                    }
+                },{
+                    text:"creer un compte",
+                    cssClass:"primary",
+                    handler:()=>{
+                        this.$router.push({path:"/CreateAcountPage"})
+                    }
+                }]
+                
+            })
+            alert.present()
+            return
+            }
              const  refUser=await doc(db,"USERS",`${user}`)
              //controle des produit qui non pas de couleur
             

@@ -76,6 +76,28 @@ export default defineComponent ({
               })
               this.leRoute="Succes"
               attendre.dismiss()
+            }else {
+               const alert = await alertController.create({
+                header:"Vous n'avez pas de compte",
+                message:"Vous devez avoir un compte pour utiliser cette fonctionalite voulez vous creer un compte ?",
+                buttons:[{
+                    text:"Non",
+                    cssClass:"primary",
+                    handler:()=>{
+                        this.$router.back()
+                        return
+                    }
+                },{
+                    text:"creer un compte",
+                    cssClass:"primary",
+                    handler:()=>{
+                        this.$router.push({path:"/CreateAcountPage"})
+                    }
+                }]
+                
+            })
+            alert.present()
+            attendre.dismiss()
             }
 
         })

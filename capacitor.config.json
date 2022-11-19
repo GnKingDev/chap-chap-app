@@ -4,12 +4,11 @@
 	"webDir": "dist",
 	"bundledWebRuntime": false,
 	"plugins":{
-		"SplashScreen":{
+		"CapacitorHttp": {
+			"enabled": true
+		  },
+		  "SplashScreen":{
 			"launchAutoHide": false
-		},
-		"LocalNotifications": {
-      "smallIcon": "ic_stat_icon",
-      "iconColor": "#03A61c"
-    }
+		}
 	}
 }

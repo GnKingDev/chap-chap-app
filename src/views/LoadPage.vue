@@ -32,6 +32,7 @@ import store from '@/VerifyUserStore';
 import { App } from '@capacitor/app';
 import axios from 'axios';
 import { doc, getDoc, getFirestore, increment, updateDoc } from '@firebase/firestore';
+import {CapacitorHttp} from '@capacitor/core'
 export default defineComponent ({
 name:'LoadPage',
 components:{
@@ -46,7 +47,8 @@ data(){
      loader:"load",
      UserVille:"",
      Axioserror:false,
-     localisatiError:false
+     localisatiError:false,
+     testtown:{}
     }
 },
 
@@ -78,12 +80,19 @@ async ionViewDidEnter(){
 
       //si la connexion est acitve
       this.loader="load"
+          const db = getFirestore(app)
+          const reftest = doc(db,"APPINFO","C2wx6jemz99AmWyPw6eA")
+          const tu = await getDoc(reftest)
+          if(tu.exists()){
+            this.testtown=tu.data()
+          }
               Geolocation.getCurrentPosition({enableHighAccuracy:true}).then(async(result)=>{
+                store.set("r","oui")
                try {
-     await axios.get(`https://geocode.maps.co/reverse?lat=${result.coords.latitude}&lon=${result.coords.longitude}`).then(async(data)=>{
-              let take = data.data
-         const auth= await getAuth(app)
-   await onAuthStateChanged(auth,async(user)=>{
+                 await axios.get(`https://geocode.maps.co/reverse?lat=${result.coords.latitude}&lon=${result.coords.longitude}`).then(async(data)=>{
+      let take =data.data
+         const auth=  getAuth(app)
+    onAuthStateChanged(auth,async(user)=>{
          const db = await getFirestore(app)
         const reftest = doc(db,"APPINFO","C2wx6jemz99AmWyPw6eA")
         const refAnalytique = doc(db,"ALLAUTHORISED","AppAnalitque")
@@ -92,8 +101,10 @@ async ionViewDidEnter(){
           Analitique:increment(1)
         })
         //fin
+        let data1={}
         await getDoc(reftest).then(async(data)=>{
-       let data1 = data.data()
+        data1 = data.data()
+
           await store.set("t",data1.test)
       })
             if(user){
@@ -128,10 +139,23 @@ async ionViewDidEnter(){
                    setTimeout(()=>App.exitApp(),2000)
                  }
                }
-                this.$router.replace({path:"/CreateAcountPage"})   
+                 if(data1.test==true){
+                  this.$router.replace({path:"/tabs/tab1"})  
+                 }else{
+                    this.$router.replace({path:"/CreateAcountPage"}) 
+                 }
+                 
             }
         })
 
+             }).catch(async(e)=>{
+              const alert = await alertController.create({
+         header:`${e.message}`,
+    
+         mode:"ios",
+         backdropDismiss:false,
+       })
+       alert.present()
              })
      } catch (e) {
        this.Axioserror=true
@@ -154,6 +178,21 @@ async ionViewDidEnter(){
        alert.present()
      }
             }).catch(async()=>{
+              if(this.testtown.test==true){
+                store.set("UserTown",`richard`)
+                 store.set("r","non")
+               await  store.set("t",this.testtown.test)
+                const auth = getAuth(app)
+                onAuthStateChanged(auth,(user)=>{
+                  if(user){
+                      this.$router.replace({path:"/tabs/tab1"})
+                  }else{
+                    this.$router.replace({path:"/tabs/tab1"}) 
+                  }
+                })
+               
+                return
+              }
               this.localisatiError=true
               this.loader="btnError"
                 const alert = await alertController.create({
@@ -209,7 +248,14 @@ async  tryAgain(){
         return
     }
     this.loader="load"
+    const db = getFirestore(app)
+    const reftest = doc(db,"APPINFO","C2wx6jemz99AmWyPw6eA")
+          const tu = await getDoc(reftest)
+          if(tu.exists()){
+            this.testtown=tu.data()
+          }
     Geolocation.getCurrentPosition({enableHighAccuracy:true}).then(async(result)=>{
+                   store.set("r","oui")
                try {
      await axios.get(`https://geocode.maps.co/reverse?lat=${result.coords.latitude}&lon=${result.coords.longitude}`).then(async(data)=>{
               let take = data.data
@@ -223,8 +269,9 @@ async  tryAgain(){
           Analitique:increment(1)
         })
         //fin
+        let data1={}
         await getDoc(reftest).then(async(data)=>{
-       let data1 = data.data()
+        data1 = data.data()
           await store.set("t",data1.test)
       })
             if(user){
@@ -259,7 +306,12 @@ async  tryAgain(){
                    setTimeout(()=>App.exitApp(),2000)
                  }
                }
-                this.$router.replace({path:"/CreateAcountPage"})   
+               if(data1.test==true){
+                this.$router.replace({path:"/tabs/tab1"})
+               }else {
+                   this.$router.replace({path:"/CreateAcountPage"})
+               }
+                   
             }
         })
 
@@ -284,6 +336,21 @@ async  tryAgain(){
        alert.present()
      }
             }).catch(async()=>{
+                   if(this.testtown.test==true){
+                store.set("UserTown",`richard`)
+                 store.set("r","non")
+                await store.set("t",true)
+                const auth = getAuth(app)
+                onAuthStateChanged(auth,(user)=>{
+                  if(user){
+                      this.$router.replace({path:"/tabs/tab1"})
+                  }else{
+                    this.$router.replace({path:"/tabs/tab1"}) 
+                  }
+                })
+               
+                return
+              }
               this.localisatiError=true
               this.loader="btnError"
                 const alert = await alertController.create({

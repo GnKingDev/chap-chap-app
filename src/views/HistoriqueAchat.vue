@@ -116,7 +116,30 @@ export default defineComponent({
      const auth = await getAuth(app)
      //controle user
      let user
-    await onAuthStateChanged(auth,(User)=>{
+    await onAuthStateChanged(auth,async(User)=>{
+      if(!User){
+        const alert = await alertController.create({
+                header:"Vous n'avez pas de compte",
+                message:"Vous devez avoir un compte pour utiliser cette fonctionalite voulez vous creer un compte ?",
+                buttons:[{
+                    text:"Non",
+                    cssClass:"primary",
+                    handler:()=>{
+                        this.$router.back()
+                        return
+                    }
+                },{
+                    text:"creer un compte",
+                    cssClass:"primary",
+                    handler:()=>{
+                        this.$router.push({path:"/CreateAcountPage"})
+                    }
+                }]
+                
+            })
+            alert.present()
+            return
+      }
       user=User.uid
       this.userUId=User.uid
     })

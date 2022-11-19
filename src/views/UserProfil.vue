@@ -1,10 +1,13 @@
 <template>
 <ion-page>
-  <ion-content :fullscreen="true">
-      <div v-if="Info.succes">
-      <ion-toolbar >
+    <ion-header>
+        <ion-toolbar >
           <ion-menu-button menu="Menu" slot="start" color="primary"></ion-menu-button>
       </ion-toolbar>
+    </ion-header>
+  <ion-content >
+      <div v-if="Info.succes">
+      
   <ion-grid class="main-header">
       <div align="center" >
           <span class="group">
@@ -77,6 +80,11 @@
           Mettre a jour
       </ion-button>
   </div>
+   <div>
+      <ion-button v-on:click="Suppre(Info.UserInfo.id)" fill="solid" expand="block" class="ion-padding" color="danger" >
+          Supprimer mon Compte
+      </ion-button>
+  </div>
 </div>
 
    <div align="center"  v-if="Info.succes==false">
@@ -92,14 +100,15 @@
 
 <script>
 import app from "@/firebase";
-import { getAuth, onAuthStateChanged } from "@firebase/auth";
+import { deleteUser, EmailAuthProvider, getAuth, onAuthStateChanged, reauthenticateWithCredential, signOut, updateEmail } from "@firebase/auth";
 import { arrayRemove, arrayUnion, collection, doc, getDoc, getFirestore, updateDoc } from "@firebase/firestore";
-import {IonContent,IonGrid,IonAvatar,IonToolbar,IonMenuButton,IonPage,IonRow,IonCol,IonLabel,IonItem,IonIcon,IonInput,IonButton,onIonViewWillEnter, loadingController, alertController,IonImg, toastController, modalController} from "@ionic/vue"
+import {IonContent,IonGrid,IonAvatar,IonToolbar,IonMenuButton,IonPage,IonRow,IonCol,IonLabel,IonItem,IonIcon,IonInput,IonButton,onIonViewWillEnter, loadingController, alertController,IonImg, toastController, modalController,IonHeader} from "@ionic/vue"
 import { defineComponent, onMounted, reactive } from "@vue/runtime-core";
 import axios from "axios";
 import ProflPicture from '@/components/ProfilPicture.vue'
-import { cart,restaurant,camera, } from 'ionicons/icons';
+import { cart,restaurant,camera, alert, } from 'ionicons/icons';
 import store from "@/VerifyUserStore";
+import router from "@/router";
 export default defineComponent ({
 name:"UserProfl",
 components:{
@@ -116,9 +125,85 @@ components:{
     IonIcon,
     IonInput,
     IonButton,
-    IonImg
+    IonImg,
+    IonHeader
 },
 setup(){
+    const Suppre = async(id)=>{
+        try {
+            
+       
+        const alert = await alertController.create({
+            header:"voulez-vous supprimer votre compte ? ",
+            message:"vous allez perdre tous vos historiques achats ,favoris et vos renseignements seront supprimer dans notre base de donnees vous aurez besion de creer un nouveau compte si voulez utiliser l'application ",
+            buttons:[{
+                text:"non",
+                cssClass:"primary",
+                handler:()=>{
+                    return
+                }
+            },{
+                text:"oui et je confirme",
+                cssClass:"danger",
+                handler:async()=>{
+                   const a1 = await alertController.create({
+                    header:"Veillez entrer votre mot de passe",
+                    inputs:[{
+                        id:"pasword",
+                        name:"pasword"
+                    }],
+                    buttons:[{
+                        text:"Annuler",
+                        cssClass:"primary",
+                        handler:()=>{
+                            return
+                        }
+                    },{
+                        text:"Confirme",
+                        cssClass:"primary",
+                        handler:async(data)=>{
+                            try {
+                                 const attendre = await loadingController.create({message:"veillez patientez"})
+                    attendre.present()
+                    const auth = getAuth(app)
+                    const user = auth.currentUser
+                      const credential = EmailAuthProvider.credential(auth.currentUser.email,data.pasword)
+                      reauthenticateWithCredential(user,credential).then(()=>{
+                        deleteUser(user).then(async()=>{
+                            attendre.dismiss()
+                            router.replace({path:"/CreateAcountPage"})
+                            const t = await toastController.create({message:"Votre compte a ete supprimer avec succes",duration:2000})
+                            t.present()
+                        }).catch(async()=>{
+                            attendre.dismiss()
+                             const a = await alertController.create({message:"erreur ou mot de passe incorecte reessayer"})
+                               a.present()
+                        })
+                      }).catch(async()=>{
+                        attendre.dismiss()
+                          const a = await alertController.create({message:"erreur ou mot de passe incorecte reessayer"})
+                               a.present()
+                      })
+                            } catch (error) {
+                                 const a = await alertController.create({message:"erreur ou mot de passe incorecte reessayer"})
+                               a.present()
+                            }
+                          
+
+                        }
+                    }]
+                   })
+                   a1.present()
+                }
+            }]
+        })
+        alert.present()
+         } catch (error) {
+            const a = await alertController.create({message:"erreur reessayer"})
+            a.present()
+        }
+         
+    }
     const Info = reactive({UserInfo:{},succes:undefined,oldNumber:"",MajBtn:false,hidenumber:undefined})
     onIonViewWillEnter(()=>{
         store.get('t').then((value)=>{
@@ -170,7 +255,7 @@ setup(){
              if(t.exists()){
                  let take = t.data()
                   await axios.post(
-    'https://chachap.herokuapp.com/https://api.orange.com/smsmessaging/v1/outbound/tel%3A%2B2240000/requests',
+    'https://api.orange.com/smsmessaging/v1/outbound/tel%3A%2B2240000/requests',
 
     {
         'outboundSMSMessageRequest': {
@@ -326,6 +411,28 @@ setup(){
              Info.succes=true
              
          }
+         }else{
+            const alert = await alertController.create({
+                header:"Vous n'avez pas de compte",
+                message:"Vous devez avoir un compte pour utiliser cette fonctionalite voulez vous creer un compte ?",
+                buttons:[{
+                    text:"Non",
+                    cssClass:"primary",
+                    handler:()=>{
+                        router.back()
+                        return
+                    }
+                },{
+                    text:"creer un compte",
+                    cssClass:"primary",
+                    handler:()=>{
+                        router.push({path:"/CreateAcountPage"})
+                    }
+                }]
+                
+            })
+            alert.present()
+            attendre.dismiss()
          }
      })
         } catch (error) {
@@ -341,7 +448,8 @@ setup(){
         camera,
         TryAgain,
         ChangePicture,
-        MAJ
+        MAJ,
+        Suppre
     }
 }
 })

@@ -1,17 +1,15 @@
 <template>
   <ion-page>
 <ion-header class="ion-no-border">
-    <div class="header ion-padding" v-if="img">
-        <div class="info">
-               <ion-back-button default-href="tabs/tab1" mode="md" ></ion-back-button>
-               <ion-avatar>
-                   <img :src="MessageInfo.linkPhoto"  />
-               </ion-avatar>
-               <span class="detail">
-                   <h1>{{MessageInfo.nomProd}}</h1>
-               </span>
-        </div>
-    </div>
+    <ion-toolbar v-if="img">
+        <ion-back-button default-href="tabs/tab1" slot="start" ></ion-back-button>
+          <ion-item>
+            <ion-avatar slot="start">
+                <img :src="MessageInfo.linkPhoto" />
+            </ion-avatar>
+           <ion-label>{{MessageInfo.nomProd}}</ion-label>
+          </ion-item>
+    </ion-toolbar>
 </ion-header>
 <ion-content>
      <div class="chat-page">
@@ -22,7 +20,7 @@
 
                     <div class="received-chats" v-if="message.type=='Four'">
                         <div class="received-chats-img">
-                            <img :src="MessageInfo.FourPhoto" alt="">
+                            <img :src="MessageInfo.FourPhoto" alt="" class="img">
                             </div>
                             <div class="received-msg">
                                 <div class="received-msg-inbox">
@@ -42,7 +40,7 @@
                             </div>
 
                                <div class="outgoing-chats-img">
-                            <img :src="MessageInfo.UserPhoto" alt="">
+                            <img :src="MessageInfo.UserPhoto" alt="" class="img">
                             </div>
                     </div>
                     </div>
@@ -67,7 +65,7 @@
 import app from '@/firebase'
 import { getAuth, onAuthStateChanged } from '@firebase/auth'
 import { doc, getDoc, getFirestore, onSnapshot, Timestamp, updateDoc } from '@firebase/firestore'
-import {IonPage,IonHeader,IonContent,IonFooter,IonIcon,IonItem,IonBackButton,IonAvatar,IonTextarea,loadingController, alertController, toastController, onIonViewDidEnter} from '@ionic/vue'
+import {IonPage,IonHeader,IonContent,IonFooter,IonIcon,IonItem,IonBackButton,IonAvatar,IonTextarea,loadingController, alertController, toastController, onIonViewDidEnter,IonToolbar,IonLabel} from '@ionic/vue'
 import { defineComponent } from '@vue/runtime-core'
 import {mic,paperPlane} from 'ionicons/icons'
 export default defineComponent({
@@ -81,7 +79,9 @@ export default defineComponent({
      IonBackButton,
      IonAvatar,
      IonTextarea,
-     IonItem
+     IonItem,
+     IonToolbar,
+     IonLabel
     
   },
   data(){
@@ -359,57 +359,10 @@ width: 100%;
     margin: 8px 0 0 ;
 }
 
-img{
+.img{
     max-width: 100%;
     border-radius: 50%;
 }
 
-ion-header{
-    ion-avatar{
-        width: 100% !important;
-        height: 100% !important;
-    }
-    .header{
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        letter-spacing: 1px;
-        height: 10vh;
-        background-color: #03A61c;
-         border-bottom-left-radius: 40px;
-         border-bottom-right-radius: 40px;
-        ion-back-button{
-            font-size: 1.6rem;
-            color: #fff;
-        }
-        .info{
-            display: flex;
-            align-items: center;
-            ion-avatar{
-                max-width: 51px;
-                max-height: 51px;
-                margin-left: 15px;
-            }
-            .detail{
-                margin-left: 15px;
-                display: flex;
-                flex-direction: column;
-                h1,p{
-                    margin: 0;
-                    color: #fff;
-                    margin-left: 10px;
-                }
-                h1{
-                    font-size: 1.2rem;
-                    font-weight: bold;
-                }
-                p{
-                    opacity: 0.7;
-                    margin-top: 3px;
-                    font-size: 0.8rem;
-                }
-            }
-        }
-    }
-}
+
 </style>
